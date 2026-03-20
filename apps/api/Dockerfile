@@ -1,15 +1,18 @@
-FROM oven/bun:1-alpine AS base
+FROM oven/bun:1
+
 WORKDIR /app
 
-# Install dependencies
 COPY package.json bun.lock* ./
+COPY apps/web/package.json apps/web/
 COPY apps/api/package.json apps/api/
 COPY packages/shared/package.json packages/shared/
-RUN bun install --frozen-lockfile --production
 
-# Copy source
+RUN bun install
+
 COPY packages/shared packages/shared
 COPY apps/api apps/api
 
+WORKDIR /app/apps/api
+
 EXPOSE 4000
-CMD ["bun", "run", "apps/api/src/index.ts"]
+CMD ["bun", "--hot", "src/index.ts"]

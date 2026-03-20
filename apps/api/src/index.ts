@@ -9,11 +9,15 @@ import states from './routes/states'
 
 const app = new Hono()
 
+const corsOrigins = (Bun.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:5173')
+	.split(',')
+	.map((s: string) => s.trim())
+
 // CORS for frontend
 app.use(
 	'/*',
 	cors({
-		origin: ['http://localhost:3000', 'http://localhost:5173'],
+		origin: corsOrigins,
 		allowMethods: ['GET'],
 	}),
 )
@@ -30,6 +34,6 @@ app.route('/expansion', expansion)
 app.route('/demand', demand)
 
 export default {
-	port: 4000,
+	port: Number(Bun.env.API_PORT) || 4000,
 	fetch: app.fetch,
 }
