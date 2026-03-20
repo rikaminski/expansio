@@ -10,6 +10,7 @@ export default function App() {
 		markers,
 		toggleMarker,
 		selectedUf,
+		setSelectedUf,
 		toggleSelectedUf,
 		filters,
 		updateFilter,
@@ -30,6 +31,7 @@ export default function App() {
 				onResetFilters={resetFilters}
 				data={data}
 				selectedUf={selectedUf}
+				onDeselectUf={() => setSelectedUf(null)}
 			/>
 
 			<main className="relative flex-1">

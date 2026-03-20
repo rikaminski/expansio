@@ -4,6 +4,7 @@ import type { FilteredData } from '../hooks/useFilteredData'
 import type { VisualizationMode } from '../hooks/useMapState'
 import CounterBar from './CounterBar'
 import FilterDropdown from './FilterDropdown'
+import StateDetail from './StateDetail'
 
 interface SidebarProps {
 	visualization: VisualizationMode
@@ -15,6 +16,7 @@ interface SidebarProps {
 	onResetFilters: () => void
 	data: FilteredData
 	selectedUf: string | null
+	onDeselectUf: () => void
 }
 
 const VISUALIZATION_OPTIONS: { value: VisualizationMode; label: string; icon: string }[] = [
@@ -43,6 +45,7 @@ export default function Sidebar({
 	onResetFilters,
 	data,
 	selectedUf,
+	onDeselectUf,
 }: SidebarProps) {
 	const hasActiveFilters =
 		filters.sectors.length > 0 ||
@@ -190,13 +193,10 @@ export default function Sidebar({
 				</div>
 			</div>
 
-			{/* Selected state indicator */}
+			{/* State detail panel */}
 			{selectedUf && (
-				<div className="animate-slide-in border-t border-surface-200 px-5 py-3">
-					<div className="flex items-center gap-2">
-						<div className="h-2 w-2 rounded-full bg-accent" />
-						<span className="text-sm font-medium text-primary">{selectedUf} selecionado</span>
-					</div>
+				<div className="border-t border-surface-200 px-5 py-4">
+					<StateDetail uf={selectedUf} data={data} onClose={onDeselectUf} />
 				</div>
 			)}
 		</aside>
