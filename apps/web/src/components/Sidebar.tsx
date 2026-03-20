@@ -61,8 +61,10 @@ export default function Sidebar({
 
 			{/* Scrollable content */}
 			<div className="flex-1 overflow-y-auto">
-				{/* Visualization — segmented control inline */}
 				<div className="border-b border-surface-200 px-5 py-3">
+					<h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary/50">
+						Análise
+					</h2>
 					<div className="inline-flex w-full rounded-lg bg-surface-50 p-0.5">
 						{VIZ_OPTIONS.map(({ value, label }) => (
 							<button
@@ -84,7 +86,7 @@ export default function Sidebar({
 				{/* Marker toggles */}
 				<div className="border-b border-surface-200 p-5">
 					<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary/50">
-						Camadas
+						Marcadores
 					</h2>
 					<div className="flex flex-col gap-2">
 						{MARKER_OPTIONS.map(({ value, label, color }) => (

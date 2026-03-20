@@ -9,6 +9,7 @@ import {
 	TileLayer,
 	Tooltip,
 	useMap,
+	useMapEvents,
 } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-cluster'
 import type { FilteredData } from '../hooks/useFilteredData'
@@ -211,11 +212,8 @@ export default function MapView({
 				<MapControls />
 				<MapRefCapture mapRef={mapRef} />
 
-				{/* Base tiles */}
-				<TileLayer
-					url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
-					opacity={0.4}
-				/>
+				{/* Zoom-aware base tiles */}
+				<DynamicTiles />
 
 				{/* State boundaries choropleth */}
 				<GeoJSON
@@ -337,4 +335,26 @@ function MapRefCapture({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null
 		mapRef.current = map
 	}, [map, mapRef])
 	return null
+}
+
+// Zoom-aware tile switching: clean tiles for choropleth, detailed tiles for street view
+const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png'
+const TILE_DETAIL = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+const ZOOM_THRESHOLD = 10
+
+function DynamicTiles() {
+	const [zoom, setZoom] = useState(4)
+	useMapEvents({
+		zoomend: (e) => setZoom(e.target.getZoom()),
+	})
+
+	const isDetailZoom = zoom > ZOOM_THRESHOLD
+
+	return (
+		<TileLayer
+			key={isDetailZoom ? 'detail' : 'light'}
+			url={isDetailZoom ? TILE_DETAIL : TILE_LIGHT}
+			opacity={isDetailZoom ? 0.9 : 0.4}
+		/>
+	)
 }
