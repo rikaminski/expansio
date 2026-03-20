@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
 	CircleMarker,
 	GeoJSON,
@@ -8,6 +8,7 @@ import {
 	Popup,
 	TileLayer,
 	Tooltip,
+	useMap,
 } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-cluster'
 import type { FilteredData } from '../hooks/useFilteredData'
@@ -128,6 +129,9 @@ export default function MapView({
 	)
 
 	// Event handlers for each feature
+	// Ref to store map instance for zoom operations
+	const mapRef = useRef<L.Map | null>(null)
+
 	const onEachFeature = useCallback(
 		(feature: GeoJSON.Feature, layer: L.Layer) => {
 			const uf = feature.properties?.uf as string
@@ -140,7 +144,14 @@ export default function MapView({
 			})
 
 			layer.on({
-				click: () => onSelectUf(uf),
+				click: () => {
+					onSelectUf(uf)
+					// Smart zoom: fit to state bounds
+					if (mapRef.current && 'getBounds' in layer) {
+						const bounds = (layer as L.Polygon).getBounds()
+						mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 8, animate: true })
+					}
+				},
 				mouseover: (e: L.LeafletMouseEvent) => {
 					const target = e.target as L.Path
 					target.setStyle({ weight: 2, color: '#475569' })
@@ -188,7 +199,7 @@ export default function MapView({
 				zoomControl={false}
 				scrollWheelZoom={true}
 				minZoom={3}
-				maxZoom={12}
+				maxZoom={18}
 				attributionControl={false}
 				maxBounds={[
 					[8, -80],
@@ -196,8 +207,9 @@ export default function MapView({
 				]}
 				maxBoundsViscosity={0.8}
 			>
-				{/* Custom zoom controls */}
+				{/* Custom zoom controls + map ref capture */}
 				<MapControls />
+				<MapRefCapture mapRef={mapRef} />
 
 				{/* Base tiles */}
 				<TileLayer
@@ -264,7 +276,12 @@ export default function MapView({
 									? (f.geometry.coordinates as [number, number])
 									: ([0, 0] as [number, number])
 							return (
-								<Marker key={f.properties?.id} position={[coords[1], coords[0]]} icon={branchIcon}>
+								<Marker
+									key={f.properties?.id}
+									position={[coords[1], coords[0]]}
+									icon={branchIcon}
+									eventHandlers={{ click: () => mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true }) }}
+								>
 									<Popup>
 										<strong>{f.properties?.name}</strong>
 										<br />
@@ -293,6 +310,7 @@ export default function MapView({
 									key={f.properties?.id}
 									position={[coords[1], coords[0]]}
 									icon={competitorIcon}
+									eventHandlers={{ click: () => mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true }) }}
 								>
 									<Popup>
 										<strong>{f.properties?.name}</strong>
@@ -310,4 +328,13 @@ export default function MapView({
 			<MapLegend visualization={visualization} />
 		</>
 	)
+}
+
+// Helper component to capture map ref
+function MapRefCapture({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null> }) {
+	const map = useMap()
+	useEffect(() => {
+		mapRef.current = map
+	}, [map, mapRef])
+	return null
 }
