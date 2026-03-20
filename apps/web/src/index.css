@@ -81,6 +81,17 @@
 	outline: none !important;
 }
 
+/* Remove focus outlines on interactive map elements (SVG paths, etc.) */
+.leaflet-interactive:focus,
+.leaflet-container svg path:focus,
+.leaflet-container *:focus {
+	outline: none !important;
+}
+
+.leaflet-container svg {
+	outline: none !important;
+}
+
 /* Hide default controls */
 .leaflet-control-attribution,
 .leaflet-control-zoom {
