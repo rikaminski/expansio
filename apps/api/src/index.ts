@@ -9,18 +9,7 @@ import states from './routes/states'
 
 const app = new Hono()
 
-const corsOrigins = (Bun.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:5173')
-	.split(',')
-	.map((s: string) => s.trim())
-
-// CORS for frontend
-app.use(
-	'/*',
-	cors({
-		origin: corsOrigins,
-		allowMethods: ['GET'],
-	}),
-)
+app.use('*', cors())
 
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok' }))
@@ -33,7 +22,13 @@ app.route('/competitors', competitorsRoute)
 app.route('/expansion', expansion)
 app.route('/demand', demand)
 
-export default {
-	port: Number(Bun.env.API_PORT) || 4000,
-	fetch: app.fetch,
+// Local dev (Bun)
+if (typeof Bun !== 'undefined') {
+	Bun.serve({
+		port: Number(Bun.env.API_PORT) || 4000,
+		fetch: app.fetch,
+	})
 }
+
+// Cloudflare Workers
+export default app

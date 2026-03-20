@@ -1,7 +1,7 @@
-const API_BASE = '/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
 async function fetchJson<T>(path: string, signal?: AbortSignal): Promise<T> {
-	const res = await fetch(`${API_BASE}${path}`, { signal })
+	const res = await fetch(`${API_URL}${path}`, { signal })
 	if (!res.ok) throw new Error(`API error: ${res.status}`)
 	return res.json()
 }

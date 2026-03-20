@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import geojsonData from '../data/brazil-states.json'
 
 const states = new Hono()
 
@@ -284,30 +285,10 @@ states.get('/', (c) => {
 	return c.json(STATE_DATA)
 })
 
-states.get('/geojson', async (c) => {
-	// Load the full GeoJSON from file
-	const file = Bun.file(new URL('../data/brazil-states.geojson', import.meta.url).pathname)
-	const exists = await file.exists()
-
-	if (exists) {
-		const geojson = await file.json()
-		return c.json(geojson)
-	}
-
-	// Fallback: generate simple point-based GeoJSON
-	const features = STATE_DATA.map((s) => ({
-		type: 'Feature' as const,
-		properties: s,
-		geometry: {
-			type: 'Point' as const,
-			coordinates: STATE_COORDS[s.uf] ? [STATE_COORDS[s.uf][1], STATE_COORDS[s.uf][0]] : [0, 0],
-		},
-	}))
-
-	return c.json({
-		type: 'FeatureCollection',
-		features,
-	})
+states.get('/geojson', (c) => {
+	// Handle both ESM default export and direct JSON import
+	const data = (geojsonData as any).default || geojsonData
+	return c.json(data)
 })
 
 export default states

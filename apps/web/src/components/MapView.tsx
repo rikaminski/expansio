@@ -33,7 +33,8 @@ const competitorIcon = new L.DivIcon({
 
 // Cluster icon creator
 function createClusterIcon(color: string) {
-	return (cluster: L.MarkerCluster) => {
+	// biome-ignore lint/suspicious/noExplicitAny: MarkerCluster type not exported from @types/leaflet
+	return (cluster: any) => {
 		const count = cluster.getChildCount()
 		return new L.DivIcon({
 			className: `cluster-icon ${color === 'branches' ? 'cluster-icon-branches' : 'cluster-icon-competitors'}`,
