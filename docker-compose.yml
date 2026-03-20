@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     ports:
-      - "${DOCKER_API_PORT:-4003}:4000"
+      - "${DOCKER_API_PORT:-4003}:${DOCKER_API_PORT:-4003}"
     environment:
-      - API_PORT=4000
+      - API_PORT=${DOCKER_API_PORT:-4003}
     restart: unless-stopped
 
   web:
@@ -14,9 +14,9 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     ports:
-      - "${DOCKER_WEB_PORT:-3003}:3000"
+      - "${DOCKER_WEB_PORT:-3003}:${DOCKER_WEB_PORT:-3003}"
     environment:
-      - WEB_PORT=3000
+      - WEB_PORT=${DOCKER_WEB_PORT:-3003}
       - VITE_API_URL=http://localhost:${DOCKER_API_PORT:-4003}
     depends_on:
       - api

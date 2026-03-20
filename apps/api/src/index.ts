@@ -22,13 +22,10 @@ app.route('/competitors', competitorsRoute)
 app.route('/expansion', expansion)
 app.route('/demand', demand)
 
-// Local dev (Bun)
-if (typeof Bun !== 'undefined') {
-	Bun.serve({
-		port: Number(Bun.env.API_PORT) || 4000,
-		fetch: app.fetch,
-	})
-}
+// Single export: Bun reads `port` + `fetch`, Workers reads only `fetch`
+const port = typeof Bun !== 'undefined' ? Number(Bun.env.API_PORT) || 4000 : 4000
 
-// Cloudflare Workers
-export default app
+export default {
+	port,
+	fetch: app.fetch,
+}
