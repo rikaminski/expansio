@@ -15,6 +15,22 @@ export default function FilterDropdown<T extends string>({
 }: FilterDropdownProps<T>) {
 	const [open, setOpen] = useState(false)
 	const ref = useRef<HTMLDivElement>(null)
+	const triggerRef = useRef<HTMLButtonElement>(null)
+	const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({})
+
+	// Calculate fixed position when opening
+	useEffect(() => {
+		if (open && triggerRef.current) {
+			const rect = triggerRef.current.getBoundingClientRect()
+			setPanelStyle({
+				position: 'fixed',
+				top: rect.bottom + 4,
+				left: rect.left,
+				width: rect.width,
+				zIndex: 9999,
+			})
+		}
+	}, [open])
 
 	// Close on outside click
 	useEffect(() => {
@@ -47,6 +63,7 @@ export default function FilterDropdown<T extends string>({
 		<div ref={ref} className="relative">
 			{/* Trigger button */}
 			<button
+				ref={triggerRef}
 				type="button"
 				onClick={() => setOpen(!open)}
 				className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all ${
@@ -106,9 +123,12 @@ export default function FilterDropdown<T extends string>({
 				</div>
 			)}
 
-			{/* Dropdown panel */}
+			{/* Dropdown panel — fixed position to avoid scroll issues */}
 			{open && (
-				<div className="absolute left-0 right-0 z-50 mt-1 animate-fade-in rounded-lg border border-surface-200 bg-white py-1 shadow-lg">
+				<div
+					style={panelStyle}
+					className="animate-fade-in rounded-lg border border-surface-200 bg-white py-1 shadow-lg"
+				>
 					{hasSelection && (
 						<button
 							type="button"
