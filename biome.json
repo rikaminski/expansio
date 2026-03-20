@@ -17,6 +17,11 @@
 			"semicolons": "asNeeded"
 		}
 	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
 	"files": {
 		"includes": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.css"]
 	}
