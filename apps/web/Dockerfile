@@ -2,7 +2,7 @@ FROM oven/bun:1
 
 WORKDIR /app
 
-COPY package.json bun.lock* ./
+COPY package.json bun.lock* tsconfig.json ./
 COPY apps/web/package.json apps/web/
 COPY apps/api/package.json apps/api/
 COPY packages/shared/package.json packages/shared/
@@ -15,4 +15,4 @@ COPY apps/web apps/web
 WORKDIR /app/apps/web
 
 EXPOSE 3000
-CMD ["bun", "run", "dev"]
+CMD ["bun", "run", "dev", "--", "--host"]
