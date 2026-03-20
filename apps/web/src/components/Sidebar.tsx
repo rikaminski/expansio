@@ -4,7 +4,6 @@ import type { FilteredData } from '../hooks/useFilteredData'
 import type { VisualizationMode } from '../hooks/useMapState'
 import CounterBar from './CounterBar'
 import FilterDropdown from './FilterDropdown'
-import StateDetail from './StateDetail'
 
 interface SidebarProps {
 	visualization: VisualizationMode
@@ -15,14 +14,12 @@ interface SidebarProps {
 	onFilterChange: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void
 	onResetFilters: () => void
 	data: FilteredData
-	selectedUf: string | null
-	onDeselectUf: () => void
 }
 
-const VISUALIZATION_OPTIONS: { value: VisualizationMode; label: string; icon: string }[] = [
-	{ value: 'marketPotential', label: 'Potencial', icon: '📊' },
-	{ value: 'expansion', label: 'Expansão', icon: '🚀' },
-	{ value: 'none', label: 'Nenhum', icon: '⬜' },
+const VIZ_OPTIONS: { value: VisualizationMode; label: string }[] = [
+	{ value: 'marketPotential', label: 'Potencial' },
+	{ value: 'expansion', label: 'Expansão' },
+	{ value: 'none', label: 'Nenhum' },
 ]
 
 const MARKER_OPTIONS: {
@@ -44,8 +41,6 @@ export default function Sidebar({
 	onFilterChange,
 	onResetFilters,
 	data,
-	selectedUf,
-	onDeselectUf,
 }: SidebarProps) {
 	const hasActiveFilters =
 		filters.sectors.length > 0 ||
@@ -82,24 +77,20 @@ export default function Sidebar({
 
 			{/* Scrollable content */}
 			<div className="flex-1 overflow-y-auto">
-				{/* Visualization mode */}
-				<div className="border-b border-surface-200 p-5">
-					<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-surface-300">
-						Visualização
-					</h2>
-					<div className="flex gap-1.5">
-						{VISUALIZATION_OPTIONS.map(({ value, label, icon }) => (
+				{/* Visualization — segmented control inline */}
+				<div className="border-b border-surface-200 px-5 py-3">
+					<div className="inline-flex w-full rounded-lg bg-surface-50 p-0.5">
+						{VIZ_OPTIONS.map(({ value, label }) => (
 							<button
 								key={value}
 								type="button"
 								onClick={() => onVisualizationChange(value)}
-								className={`flex-1 rounded-lg px-2 py-2 text-center text-xs font-medium transition-all ${
+								className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
 									visualization === value
-										? 'bg-primary text-white shadow-sm'
-										: 'bg-surface-50 text-primary/60 hover:bg-surface-100'
+										? 'bg-white text-primary shadow-sm'
+										: 'text-primary/50 hover:text-primary/70'
 								}`}
 							>
-								<span className="mr-1">{icon}</span>
 								{label}
 							</button>
 						))}
@@ -108,7 +99,7 @@ export default function Sidebar({
 
 				{/* Marker toggles */}
 				<div className="border-b border-surface-200 p-5">
-					<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-surface-300">
+					<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary/50">
 						Camadas
 					</h2>
 					<div className="flex flex-col gap-2">
@@ -151,7 +142,7 @@ export default function Sidebar({
 				{/* Filters */}
 				<div className="p-5">
 					<div className="mb-3 flex items-center justify-between">
-						<h2 className="text-xs font-semibold uppercase tracking-wider text-surface-300">
+						<h2 className="text-xs font-semibold uppercase tracking-wider text-primary/50">
 							Filtros
 						</h2>
 						{hasActiveFilters && (
@@ -192,13 +183,6 @@ export default function Sidebar({
 					</div>
 				</div>
 			</div>
-
-			{/* State detail panel */}
-			{selectedUf && (
-				<div className="border-t border-surface-200 px-5 py-4">
-					<StateDetail uf={selectedUf} data={data} onClose={onDeselectUf} />
-				</div>
-			)}
 		</aside>
 	)
 }

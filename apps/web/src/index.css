@@ -65,6 +65,28 @@
 	line-height: 1.5;
 }
 
+/* Hide tile borders/outlines */
+.leaflet-tile {
+	border: none !important;
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.leaflet-tile-pane img {
+	border: 0 !important;
+	outline: 0 !important;
+}
+
+.leaflet-tile-container {
+	outline: none !important;
+}
+
+/* Hide default controls */
+.leaflet-control-attribution,
+.leaflet-control-zoom {
+	display: none !important;
+}
+
 /* Cluster icons */
 .cluster-icon {
 	display: flex;

@@ -1,5 +1,6 @@
 import MapView from './components/MapView'
 import Sidebar from './components/Sidebar'
+import StateDetail from './components/StateDetail'
 import { useFilteredData } from './hooks/useFilteredData'
 import { useMapState } from './hooks/useMapState'
 
@@ -30,8 +31,6 @@ export default function App() {
 				onFilterChange={updateFilter}
 				onResetFilters={resetFilters}
 				data={data}
-				selectedUf={selectedUf}
-				onDeselectUf={() => setSelectedUf(null)}
 			/>
 
 			<main className="relative flex-1">
@@ -42,6 +41,13 @@ export default function App() {
 					onSelectUf={toggleSelectedUf}
 					data={data}
 				/>
+
+				{/* Floating state detail card */}
+				{selectedUf && (
+					<div className="absolute right-4 top-16 z-[1000] w-[340px] animate-fade-in rounded-xl border border-surface-200 bg-white/95 p-5 shadow-lg backdrop-blur-sm">
+						<StateDetail uf={selectedUf} data={data} onClose={() => setSelectedUf(null)} />
+					</div>
+				)}
 			</main>
 		</div>
 	)

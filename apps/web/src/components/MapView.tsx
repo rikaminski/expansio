@@ -15,6 +15,7 @@ import type { VisualizationMode } from '../hooks/useMapState'
 import { fetchBranches, fetchCompetitors, fetchStatesGeoJSON } from '../lib/api'
 import { getExpansionColor, getHeatmapColor, getNeutralColor } from '../lib/colors'
 import { formatCurrency, formatDate, formatNumber } from '../lib/format'
+import MapControls from './MapControls'
 import MapLegend from './MapLegend'
 
 // Custom marker icons
@@ -187,10 +188,18 @@ export default function MapView({
 				scrollWheelZoom={true}
 				minZoom={3}
 				maxZoom={12}
+				attributionControl={false}
+				maxBounds={[
+					[8, -80],
+					[-38, -28],
+				]}
+				maxBoundsViscosity={0.8}
 			>
+				{/* Custom zoom controls */}
+				<MapControls />
+
 				{/* Base tiles */}
 				<TileLayer
-					attribution='&copy; <a href="https://carto.com">CartoDB</a>'
 					url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
 					opacity={0.4}
 				/>

@@ -98,7 +98,7 @@ export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
 			<div className="flex items-center justify-between">
 				<div>
 					<h3 className="font-display text-lg font-bold text-primary">{name}</h3>
-					<span className="text-xs text-surface-300">{uf}</span>
+					<span className="text-xs text-primary/40">{uf}</span>
 				</div>
 				<button
 					type="button"
@@ -122,14 +122,14 @@ export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
 			{/* Key Metrics */}
 			<div className="grid grid-cols-2 gap-3">
 				<div className="rounded-lg bg-surface-50 p-3">
-					<p className="text-xs text-surface-300">Empresas</p>
+					<p className="text-xs text-primary/40">Empresas</p>
 					<p className="font-display text-xl font-bold text-primary">
 						{formatNumber(companyCount)}
 					</p>
 					<p className="text-[10px] text-surface-300">{sharePercent}% do total</p>
 				</div>
 				<div className="rounded-lg bg-surface-50 p-3">
-					<p className="text-xs text-surface-300">Demanda</p>
+					<p className="text-xs text-primary/40">Demanda</p>
 					<p className="font-display text-xl font-bold text-purple">
 						{formatCurrency(demandValue)}
 					</p>
@@ -137,13 +137,13 @@ export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
 				{stateInfo && (
 					<>
 						<div className="rounded-lg bg-surface-50 p-3">
-							<p className="text-xs text-surface-300">População</p>
+							<p className="text-xs text-primary/40">População</p>
 							<p className="font-display text-xl font-bold text-primary">
 								{formatNumber(stateInfo.population)}
 							</p>
 						</div>
 						<div className="rounded-lg bg-surface-50 p-3">
-							<p className="text-xs text-surface-300">PIB per capita</p>
+							<p className="text-xs text-primary/40">PIB per capita</p>
 							<p className="font-display text-xl font-bold text-primary">
 								{formatCurrency(stateInfo.gdpPerCapita)}
 							</p>
@@ -157,7 +157,7 @@ export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
 				<div className="flex flex-col gap-3">
 					<div>
 						<div className="mb-1 flex items-center justify-between">
-							<span className="text-xs text-surface-300">Potencial de Mercado</span>
+							<span className="text-xs text-primary/40">Potencial de Mercado</span>
 							<span className="text-xs font-semibold text-accent">
 								{formatPercent(stateInfo.potentialScore)}
 							</span>
@@ -168,7 +168,7 @@ export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
 					{expansionScore && (
 						<div>
 							<div className="mb-1 flex items-center justify-between">
-								<span className="text-xs text-surface-300">Score de Expansão</span>
+								<span className="text-xs text-primary/40">Score de Expansão</span>
 								<span className="text-xs font-semibold text-warning">
 									{formatPercent(expansionScore.similarity)}
 								</span>
@@ -181,7 +181,7 @@ export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
 
 			{/* Insights */}
 			<div className="rounded-lg border border-surface-200 p-3">
-				<h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-surface-300">
+				<h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary/50">
 					Insights
 				</h4>
 				<ul className="flex flex-col gap-1.5 text-xs text-primary/80">
