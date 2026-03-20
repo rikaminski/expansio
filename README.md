@@ -1,104 +1,151 @@
-# Expansio — Inteligência de Mercado
+# Plataforma de Inteligência de Mercado
 
-Plataforma de inteligência de mercado com **mapa interativo do Brasil**, análise de potencial de mercado, filtros avançados e recomendações de expansão.
+Ferramenta de inteligência de mercado para planejamento de expansão no varejo. Filtre empresas por segmento, visualize potencial de mercado geograficamente, identifique oportunidades de expansão por análise de similaridade e analise o cenário competitivo — tudo em um mapa interativo do Brasil.
 
-## Stack
+**Demo**: https://expansio.pages.dev
 
-| Componente | Tecnologia |
-|---|---|
-| **Frontend** | React 19, TypeScript, Vite, Tailwind CSS v4 |
-| **Backend** | Hono.js, Bun |
-| **Mapa** | Leaflet, react-leaflet v5 |
-| **Linting** | Biome v2 |
-| **Deploy** | Docker Compose / Cloudflare Workers + Pages |
+## Início Rápido
 
-## Estrutura
+```bash
+git clone https://github.com/rikaminski/expansio.git
+cd expansio
+docker compose up --build
+open http://localhost:3003
+```
+
+## Arquitetura
+
+Monorepo com três pacotes:
 
 ```
-expansio/
-├── apps/
-│   ├── api/              # Backend Hono + Bun (porta 4000)
-│   │   ├── src/
-│   │   │   ├── data/     # Geração de dados + Brazil GeoJSON
-│   │   │   ├── lib/      # Lógica de filtros
-│   │   │   └── routes/   # REST endpoints
-│   │   └── Dockerfile
-│   └── web/              # Frontend React + Vite (porta 3000)
-│       ├── src/
-│       │   ├── components/  # MapView, Sidebar, StateDetail...
-│       │   ├── hooks/       # useMapState, useFilteredData
-│       │   └── lib/         # api, colors, format
-│       └── Dockerfile
-├── packages/
-│   └── shared/           # Tipos e constantes compartilhados
+├── apps/web          React 19 + Vite + Leaflet (Cloudflare Pages)
+├── apps/api          API REST com Hono.js (Cloudflare Workers)
+├── packages/shared   Tipos TypeScript compartilhados
 ├── docker-compose.yml
 ├── biome.json
-└── tsconfig.json
+└── .env.example
 ```
 
-## Desenvolvimento
+**Frontend**: React 19, TypeScript, Tailwind CSS v4, Leaflet com react-leaflet para o mapa interativo, react-leaflet-cluster para agrupamento de marcadores. Design system com paleta customizada, tipografia Inter + Space Grotesk, e micro-animações. Deploy via Cloudflare Pages.
 
-### Pré-requisitos
+**Backend**: Hono.js rodando em Bun (dev local) e Cloudflare Workers (produção). Serve dados de empresas, filiais, concorrentes, scores de expansão e estimativas de demanda via endpoints REST. CORS wildcard para API pública somente leitura.
 
-- [Bun](https://bun.sh/) v1.3+
-- Node.js 20+ (para compatibilidade)
+**Shared**: Interfaces TypeScript para tipos de domínio (FilterState, Sector, Porte, Region, RevenueRange) consumidos por ambos frontend e backend.
 
-### Instalação
+## Camadas de Dados
 
-```bash
-bun install
-```
+A plataforma possui duas categorias de visualização no mapa:
 
-### Rodar
+### Modos de visualização (segmented control — um por vez)
 
-```bash
-# API (porta 4000)
-cd apps/api && bun run dev
+| Camada | Descrição |
+|---|---|
+| **Potencial de Mercado** | Heatmap colorindo estados pela densidade de empresas que correspondem aos filtros ativos. Verde = alta concentração, vermelho = baixa. Alimentado pelo banco de dados de empresas da plataforma. |
+| **Oportunidades de Expansão** | Análise de similaridade inspirada na metodologia Cortex Geofusion. Analisa o perfil das lojas existentes (PIB, população, densidade de empresas) e destaca estados sem presença que compartilham perfil similar. Intensidade âmbar = score de similaridade. |
 
-# Web (porta 3000)
-cd apps/web && bun run dev
+### Marcadores (checkboxes — sobreponíveis)
 
-# Ambos simultaneamente
-bun run dev
-```
+| Camada | Descrição |
+|---|---|
+| **Filiais** | Marcadores azuis com as lojas próprias. 24 localizações mockadas com agrupamento em cluster. Clique para ver nome, cidade e data de abertura. |
+| **Concorrência** | Marcadores vermelhos com concorrentes conhecidos. 39 localizações de grandes redes varejistas com cluster. Clique para ver nome e cidade. |
+| **Demanda Estimada** | Bolhas proporcionais roxas centralizadas em cada estado. Tamanho representa oportunidade de receita (quantidade de empresas × ponto médio de faturamento). Reativo aos filtros. |
 
-### Lint & Format
+## Filtros
 
-```bash
-bun run lint        # Verificar
-bun run lint:fix    # Corrigir
-bun run format      # Formatar
-```
+Painel de filtros que restringe o universo de empresas em tempo real:
 
-## API Endpoints
+- **Setor**: Varejo, Tecnologia, Saúde, Indústria, Serviços, Educação
+- **Porte**: Faixas de funcionários (1-10 até 500+)
+- **Faturamento**: Faixas de receita (R$ 0-100k até R$ 50M+)
+- **Região**: Norte, Nordeste, Centro-Oeste, Sudeste, Sul
+
+O `CounterBar` mostra o afunilamento: `850 → 80 empresas`. O mapa, scores de expansão e bolhas de demanda reagem às mudanças de filtro com debounce de 200ms.
+
+## Painel de Detalhes do Estado
+
+Clique em qualquer estado no mapa para abrir um card flutuante com métricas contextuais:
+
+- **Sempre visível**: população, PIB per capita, contagem de empresas filtradas, share percentual do total
+- **Com Expansão ativa**: score de similaridade com barra de progresso
+- **Insights automáticos**: análise qualitativa baseada nos dados do estado (alto PIB, mercado saturado, etc.)
+
+## Decisões Técnicas
+
+**Hono ao invés de Express**: Hono roda em Bun (dev local) e Cloudflare Workers (produção) sem alteração de código. Entry point único com guard `typeof Bun` para o servidor local. Resposta média < 5ms no Worker.
+
+**Leaflet ao invés de MapLibre/Deck.gl**: Leaflet é a escolha mais pragmática para choropleth + marcadores. react-leaflet oferece bindings declarativos para React 19. react-leaflet-cluster agrupa marcadores automaticamente em zoom alto.
+
+**Tailwind CSS v4 (CSS-first)**: Configuração zero — sem `tailwind.config.js`. Design tokens definidos com `@theme` diretamente no CSS. Paleta customizada com variáveis semânticas (surface, accent, danger).
+
+**Filtros server-side**: Filtragem de empresas acontece via query parameters na API, espelhando comportamento real onde o banco de dados filtra. Evita enviar o dataset completo ao cliente.
+
+**Expansão como análise de similaridade**: Ao invés de simplesmente marcar "estados sem lojas", calcula scores de similaridade baseados em PIB, população e densidade de empresas. Inspirado na metodologia Cortex Geofusion.
+
+**Dados mockados com distribuição realista**: 850 empresas distribuídas entre 27 estados ponderadas por população. 24 filiais no corredor Sudeste/Sul. 39 concorrentes de grandes redes. Faixas de receita correlacionadas com porte.
+
+**GeoJSON como import estático**: O arquivo de fronteiras dos estados é importado como módulo JSON no build, bundlado pelo esbuild. Funciona tanto em Bun (dev) quanto em Workers (produção) sem acesso a filesystem.
+
+## Endpoints da API
 
 | Endpoint | Descrição |
 |---|---|
 | `GET /health` | Health check |
-| `GET /states` | Lista de estados com dados socioeconômicos |
-| `GET /states/geojson` | GeoJSON com fronteiras dos estados |
-| `GET /companies/count?sector=...&porte=...` | Contagem total e filtrada |
-| `GET /companies/by-state?...` | Empresas por estado (com filtros) |
-| `GET /branches` | Filiais em GeoJSON |
-| `GET /competitors` | Concorrentes em GeoJSON |
-| `GET /expansion?...` | Scores de similaridade para expansão |
-| `GET /demand?...` | Demanda estimada por estado |
+| `GET /states/geojson` | GeoJSON dos estados com fronteiras e dados demográficos |
+| `GET /states` | Lista de propriedades dos estados |
+| `GET /companies/count?sector=...&porte=...` | Contagem total + filtrada |
+| `GET /companies/by-state?sector=...` | Contagem por estado (heatmap) |
+| `GET /branches` | Filiais como GeoJSON points |
+| `GET /competitors` | Concorrentes como GeoJSON points |
+| `GET /expansion?sector=...` | Scores de similaridade por estado |
+| `GET /demand?sector=...` | Demanda estimada por estado |
 
-## Docker
+## Desenvolvimento Local
 
 ```bash
-docker compose up --build
+# Instalar dependências
+bun install
+
+# Copiar variáveis de ambiente
+cp .env.example .env
+
+# Iniciar API e Web em paralelo
+cd apps/api && bun run dev    # http://localhost:4000
+cd apps/web && bun run dev    # http://localhost:3000
+
+# Lint
+bunx biome check .
+bunx biome check --write .
 ```
 
-- Web: http://localhost:3000
-- API: http://localhost:4000
+### Via Docker Compose
 
-## Funcionalidades
+```bash
+docker compose up --build     # API :4003, Web :3003
+docker compose down
+```
 
-- **Mapa coroplético** com 3 modos de visualização (Potencial, Expansão, Nenhum)
-- **Filtros cascata** por Setor, Porte, Faturamento e Região
-- **Camadas toggleáveis** (Filiais, Concorrentes, Demanda)
-- **Clustering** de marcadores com react-leaflet-cluster
-- **Painel de análise** com métricas e insights por estado
-- **Score de expansão** baseado em similaridade com perfil de filiais
-- **~850 empresas** geradas com distribuição ponderada por população
+## Deploy
+
+API e Web deployam independentemente para Cloudflare:
+
+```bash
+# API → Cloudflare Workers
+cd apps/api && npx wrangler deploy
+
+# Web → Cloudflare Pages
+cd apps/web && VITE_API_URL=https://expansio-api.ricardorkaminski.workers.dev bun run build
+cd apps/web && npx wrangler pages deploy dist --project-name expansio
+```
+
+## Variáveis de Ambiente
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `API_PORT` | `4000` | Porta da API |
+| `WEB_PORT` | `3000` | Porta do Vite |
+| `DOCKER_API_PORT` | `4003` | Porta host Docker (API) |
+| `DOCKER_WEB_PORT` | `3003` | Porta host Docker (Web) |
+| `API_URL` | `http://localhost:4000` | URL da API (Docker: `http://api:4000`) |
+| `CORS_ORIGINS` | `localhost:3000,5173,3003` | Origens CORS permitidas |
+| `VITE_API_URL` | — | URL da API para build de produção |
