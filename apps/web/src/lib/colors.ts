@@ -4,7 +4,7 @@
  */
 
 const HEATMAP_STOPS = [
-	[0, '#ef4444'], // red-500
+	[0, '#f87171'], // red-400 (softer coral)
 	[0.25, '#f97316'], // orange-500
 	[0.5, '#eab308'], // yellow-500
 	[0.75, '#84cc16'], // lime-500

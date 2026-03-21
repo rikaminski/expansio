@@ -99,9 +99,9 @@ export default function MapView({
 
 			if (visualization === 'marketPotential') {
 				const count = data.stateCompanyCounts[uf] || 0
-				const normalized = count / maxCount
+				const normalized = count > 0 ? Math.sqrt(count) / Math.sqrt(maxCount) : 0
 				fillColor = getHeatmapColor(normalized)
-				fillOpacity = Math.max(0.15, normalized * 0.75)
+				fillOpacity = Math.max(0.35, 0.35 + normalized * 0.45)
 			} else if (visualization === 'expansion') {
 				const similarity = expansionMap.get(uf)
 				if (similarity !== undefined) {

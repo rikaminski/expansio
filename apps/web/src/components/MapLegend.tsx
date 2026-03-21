@@ -11,7 +11,7 @@ export default function MapLegend({ visualization }: MapLegendProps) {
 		visualization === 'marketPotential'
 			? {
 					label: 'Potencial de Mercado',
-					gradient: 'linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)',
+					gradient: 'linear-gradient(to right, #f87171, #fb923c, #facc15, #84cc16, #22c55e)',
 					fromLabel: 'Baixo',
 					toLabel: 'Alto',
 				}
