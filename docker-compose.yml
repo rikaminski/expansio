@@ -8,6 +8,16 @@ services:
     environment:
       - API_PORT=${DOCKER_API_PORT:-4003}
     restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/api/src
+          target: /app/apps/api/src
+        - action: sync
+          path: ./packages/shared
+          target: /app/packages/shared
+        - action: rebuild
+          path: ./apps/api/package.json
 
   web:
     build:
@@ -21,3 +31,13 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/web/src
+          target: /app/apps/web/src
+        - action: sync
+          path: ./packages/shared
+          target: /app/packages/shared
+        - action: rebuild
+          path: ./apps/web/package.json

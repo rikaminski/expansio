@@ -44,10 +44,10 @@ export default function SearchBar({ onSelect }: SearchBarProps) {
 	const filtered =
 		query.length > 0
 			? STATES.filter(
-					(s) =>
-						s.name.toLowerCase().includes(query.toLowerCase()) ||
-						s.uf.toLowerCase().includes(query.toLowerCase()),
-				)
+				(s) =>
+					s.name.toLowerCase().includes(query.toLowerCase()) ||
+					s.uf.toLowerCase().includes(query.toLowerCase()),
+			)
 			: []
 
 	// Reset highlight when filtered results change
@@ -169,7 +169,7 @@ export default function SearchBar({ onSelect }: SearchBarProps) {
 					</button>
 				) : (
 					<div className="absolute right-3 top-1/2 -translate-y-1/2">
-						<kbd className="rounded border border-surface-200 bg-surface-50 px-1 py-0.5 text-[9px] font-medium text-primary/30">/</kbd>
+						<kbd className="flex h-[18px] w-[18px] items-center justify-center rounded border border-surface-200 bg-surface-50 text-[10px] font-medium leading-none text-primary/30">/</kbd>
 					</div>
 				)}
 			</div>
@@ -184,11 +184,10 @@ export default function SearchBar({ onSelect }: SearchBarProps) {
 							type="button"
 							onClick={() => handleSelect(state.uf)}
 							onMouseEnter={() => setHighlightIndex(i)}
-							className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
-								i === highlightIndex
-									? 'bg-accent/5 text-primary'
-									: 'text-primary hover:bg-surface-50'
-							}`}
+							className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${i === highlightIndex
+								? 'bg-accent/5 text-primary'
+								: 'text-primary hover:bg-surface-50'
+								}`}
 							role="option"
 							aria-selected={i === highlightIndex}
 						>
