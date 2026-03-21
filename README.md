@@ -82,6 +82,16 @@ Clique em qualquer estado no mapa para abrir um card flutuante minimizável com 
 - **Clique no marker**: `flyTo()` com zoom 17 (nível de rua) em 0.8s
 - **Tiles dinâmicos**: CartoDB Light (sem labels) para visão geral, OpenStreetMap para zoom de rua — troca automática no zoom 10
 - **Coordenação**: clicar em marker de outro estado atualiza o card sem sobrescrever o zoom do marker
+## Mobile
+
+Layout responsivo com adaptações específicas para telas pequenas:
+
+- **Bottom sheet** expansível sobre o mapa fullscreen — substitui o sidebar lateral
+- **Filtros nativos** via `<select>` com toggle de seleção (ao invés de dropdowns customizados)
+- **Filter chips** com botão "Limpar" para gerenciar filtros ativos
+- **Marcadores e análise** em layout horizontal compacto
+- **Card de estado** posicionado no rodapé com espaço otimizado
+- **Mapa fullscreen** como experiência principal
 
 ## Decisões Técnicas
 
