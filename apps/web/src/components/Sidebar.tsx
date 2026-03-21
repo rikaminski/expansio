@@ -4,6 +4,7 @@ import type { FilteredData } from '../hooks/useFilteredData'
 import type { VisualizationMode } from '../hooks/useMapState'
 import CounterBar from './CounterBar'
 import FilterDropdown from './FilterDropdown'
+import SearchBar from './SearchBar'
 
 interface SidebarProps {
 	visualization: VisualizationMode
@@ -13,6 +14,7 @@ interface SidebarProps {
 	filters: FilterState
 	onFilterChange: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void
 	onResetFilters: () => void
+	onSearchSelect: (uf: string) => void
 	data: FilteredData
 }
 
@@ -40,6 +42,7 @@ export default function Sidebar({
 	filters,
 	onFilterChange,
 	onResetFilters,
+	onSearchSelect,
 	data,
 }: SidebarProps) {
 	const hasActiveFilters =
@@ -54,6 +57,11 @@ export default function Sidebar({
 			<div className="flex h-14 items-center gap-3 border-b border-surface-200 px-5">
 				<img src="/logo.svg" alt="Expansio" className="h-8 w-8" />
 				<h1 className="font-display text-lg font-bold text-primary">Expansio</h1>
+			</div>
+
+			{/* Search */}
+			<div className="border-b border-surface-200 px-4 py-3">
+				<SearchBar onSelect={onSearchSelect} />
 			</div>
 
 			{/* Counter */}

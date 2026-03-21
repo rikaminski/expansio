@@ -187,6 +187,9 @@ export default function StateDetail({ uf, data, onClose, onMinimize }: StateDeta
 				</div>
 			)}
 
+			{/* Region comparison mini chart */}
+			<RegionChart stateCompanyCounts={data.stateCompanyCounts} currentUf={uf} />
+
 			{/* Insights */}
 			<div className="rounded-lg border border-surface-200 p-3">
 				<h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary/50">
@@ -230,6 +233,68 @@ export default function StateDetail({ uf, data, onClose, onMinimize }: StateDeta
 						</li>
 					)}
 				</ul>
+			</div>
+		</div>
+	)
+}
+
+// Region mapping for each state
+const STATE_REGION: Record<string, string> = {
+	AC: 'Norte', AL: 'Nordeste', AP: 'Norte', AM: 'Norte', BA: 'Nordeste',
+	CE: 'Nordeste', DF: 'Centro-Oeste', ES: 'Sudeste', GO: 'Centro-Oeste',
+	MA: 'Nordeste', MT: 'Centro-Oeste', MS: 'Centro-Oeste', MG: 'Sudeste',
+	PA: 'Norte', PB: 'Nordeste', PR: 'Sul', PE: 'Nordeste', PI: 'Nordeste',
+	RJ: 'Sudeste', RN: 'Nordeste', RS: 'Sul', RO: 'Norte', RR: 'Norte',
+	SC: 'Sul', SP: 'Sudeste', SE: 'Nordeste', TO: 'Norte',
+}
+
+const REGION_ORDER = ['Sudeste', 'Sul', 'Nordeste', 'Centro-Oeste', 'Norte']
+const REGION_ABBR: Record<string, string> = {
+	'Sudeste': 'SE', 'Sul': 'S', 'Nordeste': 'NE', 'Centro-Oeste': 'CO', 'Norte': 'N',
+}
+
+function RegionChart({ stateCompanyCounts, currentUf }: { stateCompanyCounts: Record<string, number>; currentUf: string }) {
+	const currentRegion = STATE_REGION[currentUf]
+
+	// Aggregate counts by region
+	const regionCounts: Record<string, number> = {}
+	for (const region of REGION_ORDER) regionCounts[region] = 0
+	for (const [uf, count] of Object.entries(stateCompanyCounts)) {
+		const region = STATE_REGION[uf]
+		if (region) regionCounts[region] = (regionCounts[region] || 0) + count
+	}
+
+	const maxCount = Math.max(...Object.values(regionCounts), 1)
+
+	return (
+		<div>
+			<h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary/50">
+				Empresas por Região
+			</h4>
+			<div className="flex flex-col gap-1.5">
+				{REGION_ORDER.map((region) => {
+					const count = regionCounts[region] || 0
+					const pct = Math.round((count / maxCount) * 100)
+					const isCurrent = region === currentRegion
+					return (
+						<div key={region} className="flex items-center gap-2">
+							<span className={`w-6 text-[10px] font-semibold ${isCurrent ? 'text-accent' : 'text-primary/40'}`}>
+								{REGION_ABBR[region]}
+							</span>
+							<div className="flex-1">
+								<div className="h-3.5 w-full overflow-hidden rounded-sm bg-surface-100">
+									<div
+										className={`h-full rounded-sm transition-all duration-500 ${isCurrent ? 'bg-accent' : 'bg-surface-300'}`}
+										style={{ width: `${pct}%` }}
+									/>
+								</div>
+							</div>
+							<span className={`w-8 text-right text-[10px] ${isCurrent ? 'font-semibold text-accent' : 'text-primary/40'}`}>
+								{count}
+							</span>
+						</div>
+					)
+				})}
 			</div>
 		</div>
 	)

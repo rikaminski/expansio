@@ -35,6 +35,10 @@ export default function App() {
 					filters={filters}
 					onFilterChange={updateFilter}
 					onResetFilters={resetFilters}
+					onSearchSelect={(uf) => {
+						toggleSelectedUf(uf)
+						setCardMinimized(false)
+					}}
 					data={data}
 				/>
 			</div>
