@@ -279,7 +279,7 @@ export default function MapView({
 									key={f.properties?.id}
 									position={[coords[1], coords[0]]}
 									icon={branchIcon}
-									eventHandlers={{ click: () => mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true }) }}
+									eventHandlers={{ click: () => mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true, duration: 0.8 }) }}
 								>
 									<Popup>
 										<strong>{f.properties?.name}</strong>
@@ -309,7 +309,7 @@ export default function MapView({
 									key={f.properties?.id}
 									position={[coords[1], coords[0]]}
 									icon={competitorIcon}
-									eventHandlers={{ click: () => mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true }) }}
+									eventHandlers={{ click: () => mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true, duration: 0.8 }) }}
 								>
 									<Popup>
 										<strong>{f.properties?.name}</strong>
@@ -353,7 +353,7 @@ function MapZoomToState({ selectedUf, geojson }: { selectedUf: string | null; ge
 
 // Zoom-aware tile switching: clean tiles for choropleth, detailed tiles for street view
 const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png'
-const TILE_DETAIL = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+const TILE_DETAIL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const ZOOM_THRESHOLD = 10
 
 function DynamicTiles() {
