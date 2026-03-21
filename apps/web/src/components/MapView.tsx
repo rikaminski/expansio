@@ -211,6 +211,7 @@ export default function MapView({
 				{/* Custom zoom controls + map ref capture */}
 				<MapControls />
 				<MapRefCapture mapRef={mapRef} />
+				<MapZoomToState selectedUf={selectedUf} geojson={geojson} />
 
 				{/* Zoom-aware base tiles */}
 				<DynamicTiles />
@@ -334,6 +335,19 @@ function MapRefCapture({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null
 	useEffect(() => {
 		mapRef.current = map
 	}, [map, mapRef])
+	return null
+}
+
+// Zoom to selected state from any source (search, map click)
+function MapZoomToState({ selectedUf, geojson }: { selectedUf: string | null; geojson: GeoJSON.FeatureCollection | null }) {
+	const map = useMap()
+	useEffect(() => {
+		if (!selectedUf || !geojson) return
+		const feature = geojson.features.find((f) => f.properties?.uf === selectedUf)
+		if (!feature) return
+		const bounds = L.geoJSON(feature).getBounds()
+		map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8, animate: true })
+	}, [selectedUf, geojson, map])
 	return null
 }
 

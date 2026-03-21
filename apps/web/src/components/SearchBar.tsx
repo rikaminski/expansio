@@ -37,23 +37,71 @@ interface SearchBarProps {
 export default function SearchBar({ onSelect }: SearchBarProps) {
 	const [query, setQuery] = useState('')
 	const [open, setOpen] = useState(false)
+	const [highlightIndex, setHighlightIndex] = useState(0)
 	const ref = useRef<HTMLDivElement>(null)
+	const listRef = useRef<HTMLDivElement>(null)
 
-	const filtered = query.length > 0
-		? STATES.filter(
-				(s) =>
-					s.name.toLowerCase().includes(query.toLowerCase()) ||
-					s.uf.toLowerCase().includes(query.toLowerCase()),
-			)
-		: []
+	const filtered =
+		query.length > 0
+			? STATES.filter(
+					(s) =>
+						s.name.toLowerCase().includes(query.toLowerCase()) ||
+						s.uf.toLowerCase().includes(query.toLowerCase()),
+				)
+			: []
+
+	// Reset highlight when filtered results change
+	useEffect(() => {
+		setHighlightIndex(0)
+	}, [filtered.length])
 
 	const handleSelect = useCallback(
 		(uf: string) => {
 			onSelect(uf)
 			setQuery('')
 			setOpen(false)
+			setHighlightIndex(0)
 		},
 		[onSelect],
+	)
+
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent) => {
+			if (!open || filtered.length === 0) {
+				if (e.key === 'Escape') setOpen(false)
+				return
+			}
+
+			switch (e.key) {
+				case 'ArrowDown':
+					e.preventDefault()
+					setHighlightIndex((prev) => {
+						const next = Math.min(prev + 1, filtered.length - 1)
+						// Scroll item into view
+						listRef.current?.children[next]?.scrollIntoView({ block: 'nearest' })
+						return next
+					})
+					break
+				case 'ArrowUp':
+					e.preventDefault()
+					setHighlightIndex((prev) => {
+						const next = Math.max(prev - 1, 0)
+						listRef.current?.children[next]?.scrollIntoView({ block: 'nearest' })
+						return next
+					})
+					break
+				case 'Enter':
+					e.preventDefault()
+					if (filtered[highlightIndex]) {
+						handleSelect(filtered[highlightIndex].uf)
+					}
+					break
+				case 'Escape':
+					setOpen(false)
+					break
+			}
+		},
+		[open, filtered, highlightIndex, handleSelect],
 	)
 
 	// Close on outside click
@@ -67,6 +115,8 @@ export default function SearchBar({ onSelect }: SearchBarProps) {
 		document.addEventListener('mousedown', handler)
 		return () => document.removeEventListener('mousedown', handler)
 	}, [open])
+
+	const showEnterHint = open && filtered.length > 0
 
 	return (
 		<div ref={ref} className="relative">
@@ -94,10 +144,16 @@ export default function SearchBar({ onSelect }: SearchBarProps) {
 						setOpen(e.target.value.length > 0)
 					}}
 					onFocus={() => query.length > 0 && setOpen(true)}
+					onKeyDown={handleKeyDown}
 					placeholder="Buscar estado..."
-					className="w-full rounded-lg border border-surface-200 bg-white py-2 pl-9 pr-3 text-sm text-primary placeholder:text-primary/30 focus:border-accent/30 focus:outline-none focus:ring-1 focus:ring-accent/20"
+					className="w-full rounded-lg border border-surface-200 bg-white py-2 pl-9 pr-9 text-sm text-primary placeholder:text-primary/30 focus:border-accent/30 focus:outline-none focus:ring-1 focus:ring-accent/20"
+					role="combobox"
+					aria-expanded={open}
+					aria-autocomplete="list"
+					aria-activedescendant={open && filtered[highlightIndex] ? `search-${filtered[highlightIndex].uf}` : undefined}
 				/>
-				{query && (
+				{/* Right icon: clear or Enter hint */}
+				{query ? (
 					<button
 						type="button"
 						onClick={() => {
@@ -111,21 +167,38 @@ export default function SearchBar({ onSelect }: SearchBarProps) {
 							<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
 						</svg>
 					</button>
+				) : (
+					<div className="absolute right-3 top-1/2 -translate-y-1/2">
+						<kbd className="rounded border border-surface-200 bg-surface-50 px-1 py-0.5 text-[9px] font-medium text-primary/30">/</kbd>
+					</div>
 				)}
 			</div>
 
 			{/* Results dropdown */}
 			{open && filtered.length > 0 && (
-				<div className="absolute left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-lg border border-surface-200 bg-white py-1 shadow-lg">
-					{filtered.map((state) => (
+				<div ref={listRef} className="absolute left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-lg border border-surface-200 bg-white py-1 shadow-lg" role="listbox">
+					{filtered.map((state, i) => (
 						<button
 							key={state.uf}
+							id={`search-${state.uf}`}
 							type="button"
 							onClick={() => handleSelect(state.uf)}
-							className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-primary hover:bg-surface-50"
+							onMouseEnter={() => setHighlightIndex(i)}
+							className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
+								i === highlightIndex
+									? 'bg-accent/5 text-primary'
+									: 'text-primary hover:bg-surface-50'
+							}`}
+							role="option"
+							aria-selected={i === highlightIndex}
 						>
-							<span className="w-7 shrink-0 text-xs font-semibold text-primary/40">{state.uf}</span>
-							<span>{state.name}</span>
+							<span className={`w-7 shrink-0 text-xs font-semibold ${i === highlightIndex ? 'text-accent' : 'text-primary/40'}`}>
+								{state.uf}
+							</span>
+							<span className="flex-1">{state.name}</span>
+							{i === highlightIndex && (
+								<kbd className="rounded border border-surface-200 bg-surface-50 px-1.5 py-0.5 text-[9px] font-medium text-primary/30">↵</kbd>
+							)}
 						</button>
 					))}
 				</div>
