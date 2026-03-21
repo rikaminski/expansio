@@ -278,7 +278,7 @@ export default function App() {
 							filters.revenueRanges.length > 0 ||
 							filters.regions.length > 0) && (
 							<div className="mt-2 flex flex-wrap gap-1">
-								{Object.entries(filters).flatMap(([key, values]) =>
+								{Object.entries(filters).filter(([, v]) => Array.isArray(v)).flatMap(([key, values]) =>
 									(values as string[]).map((v) => (
 										<span
 											key={`${key}-${v}`}

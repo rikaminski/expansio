@@ -21,23 +21,18 @@ export default function FilterDropdown<T extends string>({
 	// Calculate fixed position when opening — flip up if no space below
 	useEffect(() => {
 		if (open && triggerRef.current) {
-			const rect = triggerRef.current.getBoundingClientRect()
 			const isMobile = window.innerWidth < 768
-			const panelHeight = 250
 
 			if (isMobile) {
-				// Mobile: simple absolute positioning within sidebar flow
+				// Mobile: render inline, no positioning needed
 				setPanelStyle({
-					position: 'absolute',
-					left: 0,
-					right: 0,
-					top: '100%',
-					marginTop: 4,
-					zIndex: 9999,
 					maxHeight: '200px',
 					overflowY: 'auto',
+					zIndex: 9999,
 				})
 			} else {
+				const rect = triggerRef.current.getBoundingClientRect()
+				const panelHeight = 250
 				const spaceBelow = window.innerHeight - rect.bottom
 				const flipUp = spaceBelow < panelHeight && rect.top > panelHeight
 
