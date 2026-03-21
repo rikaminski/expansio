@@ -193,6 +193,12 @@ function generateCompanies(): Company[] {
 			const revenue = weightedPick(revenueConfig.options, revenueConfig.weights)
 			const name = `${pick(COMPANY_NAMES[sector])} ${uf}-${id}`
 
+			// Random date between 2020-01-01 and 2024-06-01
+			const startMs = new Date('2020-01-01').getTime()
+			const endMs = new Date('2024-06-01').getTime()
+			const foundedMs = startMs + rand() * (endMs - startMs)
+			const foundedAt = new Date(foundedMs).toISOString().split('T')[0]
+
 			companies.push({
 				id: `comp-${id}`,
 				name,
@@ -203,6 +209,7 @@ function generateCompanies(): Company[] {
 				city: capital.city,
 				lat: capital.lat + (rand() - 0.5) * 2,
 				lng: capital.lng + (rand() - 0.5) * 2,
+				foundedAt,
 			})
 			id++
 		}

@@ -8,6 +8,7 @@ function buildParams(filters: FilterState): string {
 	if (filters.portes.length) parts.push(`porte=${filters.portes.join(',')}`)
 	if (filters.revenueRanges.length) parts.push(`revenue=${filters.revenueRanges.join(',')}`)
 	if (filters.regions.length) parts.push(`region=${filters.regions.join(',')}`)
+	if (filters.period !== 'all') parts.push(`period=${filters.period}`)
 	return parts.join('&')
 }
 

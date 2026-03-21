@@ -25,5 +25,12 @@ export function applyFilters(companies: Company[], params: URLSearchParams): Com
 		result = result.filter((c) => ufs.includes(c.uf))
 	}
 
+	const period = params.get('period')
+	if (period === '12months') {
+		// Reference date: 2024-06-01 (mock "today"), 12 months back = 2023-06-01
+		const cutoff = '2023-06-01'
+		result = result.filter((c) => c.foundedAt >= cutoff)
+	}
+
 	return result
 }

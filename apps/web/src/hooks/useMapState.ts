@@ -15,6 +15,7 @@ const DEFAULT_FILTERS: FilterState = {
 	portes: [],
 	revenueRanges: [],
 	regions: [],
+	period: 'all',
 }
 
 export function useMapState() {

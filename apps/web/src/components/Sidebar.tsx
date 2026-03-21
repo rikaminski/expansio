@@ -91,44 +91,52 @@ export default function Sidebar({
 					</div>
 				</div>
 
-				{/* Marker toggles */}
-				<div className="border-b border-surface-200 p-5">
-					<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary/50">
+			{/* Marker toggles — compact */}
+				<div className="border-b border-surface-200 px-5 py-3">
+					<h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary/50">
 						Marcadores
 					</h2>
-					<div className="flex flex-col gap-2">
+					<div className="flex gap-1.5">
 						{MARKER_OPTIONS.map(({ value, label, color }) => (
 							<label
 								key={value}
-								className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-surface-50"
+								className={`flex cursor-pointer items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-all ${
+									markers.has(value)
+										? `${color} text-white shadow-sm`
+										: 'bg-surface-50 text-primary/50 hover:text-primary/70'
+								}`}
 							>
-								<div
-									className={`flex h-5 w-5 items-center justify-center rounded transition-all ${
-										markers.has(value) ? `${color} shadow-sm` : 'border border-surface-300 bg-white'
-									}`}
-								>
-									{markers.has(value) && (
-										<svg
-											className="h-3.5 w-3.5 text-white"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											strokeWidth={3}
-											role="img"
-											aria-label="Active"
-										>
-											<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-										</svg>
-									)}
-								</div>
-								<span className="text-sm text-primary/80">{label}</span>
 								<input
 									type="checkbox"
 									className="sr-only"
 									checked={markers.has(value)}
 									onChange={() => onToggleMarker(value)}
 								/>
+								{label}
 							</label>
+						))}
+					</div>
+				</div>
+
+				{/* Period toggle */}
+				<div className="border-b border-surface-200 px-5 py-3">
+					<h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary/50">
+						Período
+					</h2>
+					<div className="inline-flex w-full rounded-lg bg-surface-50 p-0.5">
+						{([['all', 'Histórico completo'], ['12months', 'Últimos 12 meses']] as const).map(([value, label]) => (
+							<button
+								key={value}
+								type="button"
+								onClick={() => onFilterChange('period', value)}
+								className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+									filters.period === value
+										? 'bg-white text-primary shadow-sm'
+										: 'text-primary/50 hover:text-primary/70'
+								}`}
+							>
+								{label}
+							</button>
 						))}
 					</div>
 				</div>

@@ -24,6 +24,7 @@ export interface Company {
 	city: string
 	lat: number
 	lng: number
+	foundedAt: string
 }
 
 export interface Branch {
@@ -45,11 +46,14 @@ export interface Competitor {
 	lng: number
 }
 
+export type Period = '12months' | 'all'
+
 export interface FilterState {
 	sectors: Sector[]
 	portes: Porte[]
 	revenueRanges: RevenueRange[]
 	regions: Region[]
+	period: Period
 }
 
 export interface CounterData {
