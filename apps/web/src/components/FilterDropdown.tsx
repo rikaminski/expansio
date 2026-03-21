@@ -92,17 +92,19 @@ export default function FilterDropdown<T extends string>({
 				<span className="truncate">{label}</span>
 				<div className="flex shrink-0 items-center gap-1">
 					{hasSelection && (
-						<button
-							type="button"
-							className="flex h-4 w-4 items-center justify-center rounded-full bg-accent/10 text-[10px] font-semibold text-accent"
+						<span
+							role="button"
+							tabIndex={0}
+							className="flex h-4 w-4 items-center justify-center rounded-full bg-accent/10 text-[10px] font-semibold text-accent cursor-pointer"
 							onClick={(e) => {
 								e.stopPropagation()
 								clear()
 							}}
+							onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); clear() } }}
 							aria-label="Limpar"
 						>
 							×
-						</button>
+						</span>
 					)}
 					<svg
 						className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`}
