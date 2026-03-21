@@ -51,24 +51,37 @@ A plataforma possui duas categorias de visualização no mapa:
 | **Concorrência** | Marcadores vermelhos com concorrentes conhecidos. 39 localizações de grandes redes varejistas com cluster. Clique para ver nome e cidade. |
 | **Demanda Estimada** | Bolhas proporcionais roxas centralizadas em cada estado. Tamanho representa oportunidade de receita (quantidade de empresas × ponto médio de faturamento). Reativo aos filtros. |
 
-## Filtros
+## Busca e Filtros
 
-Painel de filtros que restringe o universo de empresas em tempo real:
+**Barra de busca** no topo do sidebar com autocomplete por nome ou sigla do estado. Navegação por setas (↑↓), seleção com Enter, e zoom automático no estado selecionado.
+
+**Filtro por período**: toggle segmentado "Últimos 12 meses" / "Histórico completo". Filtra empresas pela data de fundação (`foundedAt`), afetando o heatmap, demanda e contadores.
+
+**Filtros de segmento** que restringem o universo de empresas em tempo real:
 
 - **Setor**: Varejo, Tecnologia, Saúde, Indústria, Serviços, Educação
 - **Porte**: Faixas de funcionários (1-10 até 500+)
 - **Faturamento**: Faixas de receita (R$ 0-100k até R$ 50M+)
 - **Região**: Norte, Nordeste, Centro-Oeste, Sudeste, Sul
 
-O `CounterBar` mostra o afunilamento: `850 → 80 empresas`. O mapa, scores de expansão e bolhas de demanda reagem às mudanças de filtro com debounce de 200ms.
+O `CounterBar` mostra o afunilamento: `873 → 80 empresas`. O mapa, scores de expansão e bolhas de demanda reagem às mudanças de filtro com debounce de 200ms.
 
 ## Painel de Detalhes do Estado
 
-Clique em qualquer estado no mapa para abrir um card flutuante com métricas contextuais:
+Clique em qualquer estado no mapa para abrir um card flutuante minimizável com métricas contextuais:
 
 - **Sempre visível**: população, PIB per capita, contagem de empresas filtradas, share percentual do total
 - **Com Expansão ativa**: score de similaridade com barra de progresso
+- **Gráfico comparativo**: mini bar chart horizontal com contagem de empresas por região (SE, S, NE, CO, N), região do estado selecionado destacada
 - **Insights automáticos**: análise qualitativa baseada nos dados do estado (alto PIB, mercado saturado, etc.)
+- **Minimizável**: colapsa para uma barra compacta com nome do estado + contagem de empresas
+
+## Zoom Inteligente
+
+- **Clique no estado**: `fitBounds()` ajusta o zoom à fronteira do estado
+- **Clique no marker**: `flyTo()` com zoom 17 (nível de rua) em 0.8s
+- **Tiles dinâmicos**: CartoDB Light (sem labels) para visão geral, OpenStreetMap para zoom de rua — troca automática no zoom 10
+- **Coordenação**: clicar em marker de outro estado atualiza o card sem sobrescrever o zoom do marker
 
 ## Decisões Técnicas
 
@@ -82,7 +95,7 @@ Clique em qualquer estado no mapa para abrir um card flutuante com métricas con
 
 **Expansão como análise de similaridade**: Ao invés de simplesmente marcar "estados sem lojas", calcula scores de similaridade baseados em PIB, população e densidade de empresas. Inspirado na metodologia Cortex Geofusion.
 
-**Dados mockados com distribuição realista**: 850 empresas distribuídas entre 27 estados ponderadas por população. 24 filiais no corredor Sudeste/Sul. 39 concorrentes de grandes redes. Faixas de receita correlacionadas com porte.
+**Dados mockados com distribuição realista**: 873 empresas distribuídas entre 27 estados ponderadas por população. 24 filiais no corredor Sudeste/Sul. 39 concorrentes de grandes redes. Faixas de receita correlacionadas com porte. Cada empresa possui `foundedAt` (2020-2024) para suportar filtro por período.
 
 **GeoJSON como import estático**: O arquivo de fronteiras dos estados é importado como módulo JSON no build, bundlado pelo esbuild. Funciona tanto em Bun (dev) quanto em Workers (produção) sem acesso a filesystem.
 
@@ -122,6 +135,7 @@ bunx biome check --write .
 
 ```bash
 docker compose up --build     # API :4003, Web :3003
+docker compose up --watch     # Hot reload com sync de arquivos
 docker compose down
 ```
 
