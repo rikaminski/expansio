@@ -64,6 +64,7 @@ export default function MapView({
 	const [geojson, setGeojson] = useState<GeoJSON.FeatureCollection | null>(null)
 	const [branchesData, setBranchesData] = useState<GeoJSON.FeatureCollection | null>(null)
 	const [competitorsData, setCompetitorsData] = useState<GeoJSON.FeatureCollection | null>(null)
+	const skipZoomRef = useRef(false)
 
 	// Load static data once
 	useEffect(() => {
@@ -211,7 +212,7 @@ export default function MapView({
 				{/* Custom zoom controls + map ref capture */}
 				<MapControls />
 				<MapRefCapture mapRef={mapRef} />
-				<MapZoomToState selectedUf={selectedUf} geojson={geojson} />
+				<MapZoomToState selectedUf={selectedUf} geojson={geojson} skipZoomRef={skipZoomRef} />
 
 				{/* Zoom-aware base tiles */}
 				<DynamicTiles />
@@ -279,7 +280,7 @@ export default function MapView({
 									key={f.properties?.id}
 									position={[coords[1], coords[0]]}
 									icon={branchIcon}
-									eventHandlers={{ click: () => mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true, duration: 0.8 }) }}
+									eventHandlers={{ click: (e) => { L.DomEvent.stopPropagation(e.originalEvent); skipZoomRef.current = true; onSelectUf(f.properties?.uf || ''); mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true, duration: 0.8 }) } }}
 								>
 									<Popup>
 										<strong>{f.properties?.name}</strong>
@@ -309,7 +310,7 @@ export default function MapView({
 									key={f.properties?.id}
 									position={[coords[1], coords[0]]}
 									icon={competitorIcon}
-									eventHandlers={{ click: () => mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true, duration: 0.8 }) }}
+									eventHandlers={{ click: (e) => { L.DomEvent.stopPropagation(e.originalEvent); skipZoomRef.current = true; onSelectUf(f.properties?.uf || ''); mapRef.current?.flyTo([coords[1], coords[0]], 17, { animate: true, duration: 0.8 }) } }}
 								>
 									<Popup>
 										<strong>{f.properties?.name}</strong>
@@ -339,15 +340,19 @@ function MapRefCapture({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null
 }
 
 // Zoom to selected state from any source (search, map click)
-function MapZoomToState({ selectedUf, geojson }: { selectedUf: string | null; geojson: GeoJSON.FeatureCollection | null }) {
+function MapZoomToState({ selectedUf, geojson, skipZoomRef }: { selectedUf: string | null; geojson: GeoJSON.FeatureCollection | null; skipZoomRef: React.MutableRefObject<boolean> }) {
 	const map = useMap()
 	useEffect(() => {
+		if (skipZoomRef.current) {
+			skipZoomRef.current = false
+			return
+		}
 		if (!selectedUf || !geojson) return
 		const feature = geojson.features.find((f) => f.properties?.uf === selectedUf)
 		if (!feature) return
 		const bounds = L.geoJSON(feature).getBounds()
 		map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8, animate: true })
-	}, [selectedUf, geojson, map])
+	}, [selectedUf, geojson, map, skipZoomRef])
 	return null
 }
 
