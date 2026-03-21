@@ -16,6 +16,8 @@ cd apps/api && bunx wrangler deploy
 
 ```bash
 cd apps/web && bun run build && bunx wrangler pages deploy dist
+cd /home/ostuff/expansio/apps/web && VITE_API_URL=https://expansio-api.ricardorkaminski.workers.dev bun run build && bunx wrangler pages deploy dist
+
 ```
 
 ## Opção 2 — Docker Compose (local / staging)
