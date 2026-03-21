@@ -10,7 +10,7 @@ Ferramenta de inteligência de mercado para planejamento de expansão no varejo.
 git clone https://github.com/rikaminski/expansio.git
 cd expansio
 docker compose up --build
-open http://localhost:3003
+open http://localhost:3000
 ```
 
 ## Arquitetura
@@ -144,7 +144,7 @@ bunx biome check --write .
 ### Via Docker Compose
 
 ```bash
-docker compose up --build     # API :4003, Web :3003
+docker compose up --build     # API :4000, Web :3000
 docker compose up --watch     # Hot reload com sync de arquivos
 docker compose down
 ```
@@ -168,8 +168,8 @@ cd apps/web && npx wrangler pages deploy dist --project-name expansio
 |---|---|---|
 | `API_PORT` | `4000` | Porta da API |
 | `WEB_PORT` | `3000` | Porta do Vite |
-| `DOCKER_API_PORT` | `4003` | Porta host Docker (API) |
-| `DOCKER_WEB_PORT` | `3003` | Porta host Docker (Web) |
+| `DOCKER_API_PORT` | `4000` | Porta host Docker (API) |
+| `DOCKER_WEB_PORT` | `3000` | Porta host Docker (Web) |
 | `API_URL` | `http://localhost:4000` | URL da API (Docker: `http://api:4000`) |
-| `CORS_ORIGINS` | `localhost:3000,5173,3003` | Origens CORS permitidas |
+| `CORS_ORIGINS` | `localhost:3000,5173` | Origens CORS permitidas |
 | `VITE_API_URL` | — | URL da API para build de produção |
