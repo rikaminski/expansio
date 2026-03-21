@@ -22,19 +22,35 @@ export default function FilterDropdown<T extends string>({
 	useEffect(() => {
 		if (open && triggerRef.current) {
 			const rect = triggerRef.current.getBoundingClientRect()
-			const panelHeight = 250 // estimated max height
-			const spaceBelow = window.innerHeight - rect.bottom
-			const flipUp = spaceBelow < panelHeight && rect.top > panelHeight
+			const isMobile = window.innerWidth < 768
+			const panelHeight = 250
 
-			setPanelStyle({
-				position: 'fixed',
-				...(flipUp
-					? { bottom: window.innerHeight - rect.top + 4 }
-					: { top: rect.bottom + 4 }),
-				left: rect.left,
-				width: rect.width,
-				zIndex: 9999,
-			})
+			if (isMobile) {
+				// Mobile: simple absolute positioning within sidebar flow
+				setPanelStyle({
+					position: 'absolute',
+					left: 0,
+					right: 0,
+					top: '100%',
+					marginTop: 4,
+					zIndex: 9999,
+					maxHeight: '200px',
+					overflowY: 'auto',
+				})
+			} else {
+				const spaceBelow = window.innerHeight - rect.bottom
+				const flipUp = spaceBelow < panelHeight && rect.top > panelHeight
+
+				setPanelStyle({
+					position: 'fixed',
+					...(flipUp
+						? { bottom: window.innerHeight - rect.top + 4 }
+						: { top: rect.bottom + 4 }),
+					left: rect.left,
+					width: rect.width,
+					zIndex: 9999,
+				})
+			}
 		}
 	}, [open])
 
