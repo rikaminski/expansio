@@ -18,13 +18,19 @@ export default function FilterDropdown<T extends string>({
 	const triggerRef = useRef<HTMLButtonElement>(null)
 	const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({})
 
-	// Calculate fixed position when opening
+	// Calculate fixed position when opening — flip up if no space below
 	useEffect(() => {
 		if (open && triggerRef.current) {
 			const rect = triggerRef.current.getBoundingClientRect()
+			const panelHeight = 250 // estimated max height
+			const spaceBelow = window.innerHeight - rect.bottom
+			const flipUp = spaceBelow < panelHeight && rect.top > panelHeight
+
 			setPanelStyle({
 				position: 'fixed',
-				top: rect.bottom + 4,
+				...(flipUp
+					? { bottom: window.innerHeight - rect.top + 4 }
+					: { top: rect.bottom + 4 }),
 				left: rect.left,
 				width: rect.width,
 				zIndex: 9999,
