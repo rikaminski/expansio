@@ -30,11 +30,14 @@ const STATES: { uf: string; name: string }[] = [
 	{ uf: 'TO', name: 'Tocantins' },
 ]
 
+import type { RefObject } from 'react'
+
 interface SearchBarProps {
 	onSelect: (uf: string) => void
+	inputRef?: RefObject<HTMLInputElement | null>
 }
 
-export default function SearchBar({ onSelect }: SearchBarProps) {
+export default function SearchBar({ onSelect, inputRef }: SearchBarProps) {
 	const [query, setQuery] = useState('')
 	const [open, setOpen] = useState(false)
 	const [highlightIndex, setHighlightIndex] = useState(0)
@@ -137,6 +140,7 @@ export default function SearchBar({ onSelect }: SearchBarProps) {
 					/>
 				</svg>
 				<input
+					ref={(el) => { if (inputRef) (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = el }}
 					type="text"
 					value={query}
 					onChange={(e) => {

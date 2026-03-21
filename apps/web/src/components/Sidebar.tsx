@@ -6,6 +6,8 @@ import CounterBar from './CounterBar'
 import FilterDropdown from './FilterDropdown'
 import SearchBar from './SearchBar'
 
+import type { RefObject } from 'react'
+
 interface SidebarProps {
 	visualization: VisualizationMode
 	onVisualizationChange: (v: VisualizationMode) => void
@@ -15,23 +17,25 @@ interface SidebarProps {
 	onFilterChange: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void
 	onResetFilters: () => void
 	onSearchSelect: (uf: string) => void
+	searchRef: RefObject<HTMLInputElement | null>
 	data: FilteredData
 }
 
-const VIZ_OPTIONS: { value: VisualizationMode; label: string }[] = [
-	{ value: 'marketPotential', label: 'Potencial' },
-	{ value: 'expansion', label: 'Expansão' },
-	{ value: 'none', label: 'Nenhum' },
+const VIZ_OPTIONS: { value: VisualizationMode; label: string; key: string }[] = [
+	{ value: 'marketPotential', label: 'Potencial', key: '1' },
+	{ value: 'expansion', label: 'Expansão', key: '2' },
+	{ value: 'none', label: 'Nenhum', key: '3' },
 ]
 
 const MARKER_OPTIONS: {
 	value: 'branches' | 'competition' | 'demand'
 	label: string
 	color: string
+	key: string
 }[] = [
-	{ value: 'branches', label: 'Filiais', color: 'bg-accent' },
-	{ value: 'competition', label: 'Concorrentes', color: 'bg-danger' },
-	{ value: 'demand', label: 'Demanda', color: 'bg-purple' },
+	{ value: 'branches', label: 'Filiais', color: 'bg-accent', key: 'Q' },
+	{ value: 'competition', label: 'Concorrentes', color: 'bg-danger', key: 'W' },
+	{ value: 'demand', label: 'Demanda', color: 'bg-purple', key: 'E' },
 ]
 
 export default function Sidebar({
@@ -43,6 +47,7 @@ export default function Sidebar({
 	onFilterChange,
 	onResetFilters,
 	onSearchSelect,
+	searchRef,
 	data,
 }: SidebarProps) {
 	const hasActiveFilters =
@@ -61,7 +66,7 @@ export default function Sidebar({
 
 			{/* Search */}
 			<div className="border-b border-surface-200 px-4 py-3">
-				<SearchBar onSelect={onSearchSelect} />
+				<SearchBar onSelect={onSearchSelect} inputRef={searchRef} />
 			</div>
 
 			{/* Counter */}
@@ -74,18 +79,19 @@ export default function Sidebar({
 						Análise
 					</h2>
 					<div className="inline-flex w-full rounded-lg bg-surface-50 p-0.5">
-						{VIZ_OPTIONS.map(({ value, label }) => (
+						{VIZ_OPTIONS.map(({ value, label, key }) => (
 							<button
 								key={value}
 								type="button"
 								onClick={() => onVisualizationChange(value)}
-								className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+								className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
 									visualization === value
 										? 'bg-white text-primary shadow-sm'
 										: 'text-primary/50 hover:text-primary/70'
 								}`}
 							>
 								{label}
+								<kbd className="rounded border border-surface-200 bg-surface-50 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary/40">{key}</kbd>
 							</button>
 						))}
 					</div>
@@ -97,7 +103,7 @@ export default function Sidebar({
 						Marcadores
 					</h2>
 					<div className="flex gap-1.5">
-						{MARKER_OPTIONS.map(({ value, label, color }) => (
+						{MARKER_OPTIONS.map(({ value, label, color, key }) => (
 							<label
 								key={value}
 								className={`flex cursor-pointer items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-all ${
@@ -113,6 +119,11 @@ export default function Sidebar({
 									onChange={() => onToggleMarker(value)}
 								/>
 								{label}
+								<kbd className={`rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none ${
+									markers.has(value)
+										? 'border-white/40 text-white/70'
+										: 'border-surface-200 text-primary/40'
+								}`}>{key}</kbd>
 							</label>
 						))}
 					</div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import MapView from './components/MapView'
 import Sidebar from './components/Sidebar'
 import StateDetail from './components/StateDetail'
@@ -22,6 +22,25 @@ export default function App() {
 	const data = useFilteredData(filters)
 	const [mobileOpen, setMobileOpen] = useState(false)
 	const [cardMinimized, setCardMinimized] = useState(false)
+	const searchRef = useRef<HTMLInputElement>(null)
+
+	// Global keyboard shortcuts
+	useEffect(() => {
+		const handler = (e: KeyboardEvent) => {
+			if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+			switch (e.key) {
+				case '1': setVisualization('marketPotential'); break
+				case '2': setVisualization('expansion'); break
+				case '3': setVisualization('none'); break
+				case 'q': case 'Q': toggleMarker('branches'); break
+				case 'w': case 'W': toggleMarker('competition'); break
+				case 'e': case 'E': toggleMarker('demand'); break
+				case '/': e.preventDefault(); searchRef.current?.focus(); break
+			}
+		}
+		window.addEventListener('keydown', handler)
+		return () => window.removeEventListener('keydown', handler)
+	}, [setVisualization, toggleMarker])
 
 	return (
 		<div className="flex h-screen w-screen flex-col overflow-hidden bg-surface-50 md:flex-row">
@@ -35,6 +54,7 @@ export default function App() {
 					filters={filters}
 					onFilterChange={updateFilter}
 					onResetFilters={resetFilters}
+					searchRef={searchRef}
 					onSearchSelect={(uf) => {
 						toggleSelectedUf(uf)
 						setCardMinimized(false)
