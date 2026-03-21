@@ -1,6 +1,6 @@
-import type { FilterState } from '@expansio/shared'
+import type { FilterState, State } from '@expansio/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { fetchCompaniesByState, fetchCompanyCount, fetchDemand, fetchExpansion } from '../lib/api'
+import { fetchCompaniesByState, fetchCompanyCount, fetchDemand, fetchExpansion, fetchStates } from '../lib/api'
 
 function buildParams(filters: FilterState): string {
 	const parts: string[] = []
@@ -18,6 +18,7 @@ export interface FilteredData {
 	stateCompanyCounts: Record<string, number>
 	expansionScores: Array<{ uf: string; similarity: number }>
 	demandByState: Record<string, number>
+	statesInfo: Record<string, State>
 	loading: boolean
 }
 
@@ -28,11 +29,21 @@ export function useFilteredData(filters: FilterState): FilteredData {
 		stateCompanyCounts: {},
 		expansionScores: [],
 		demandByState: {},
+		statesInfo: {},
 		loading: true,
 	})
 
 	const abortRef = useRef<AbortController | null>(null)
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	// Fetch static states data once on mount
+	useEffect(() => {
+		fetchStates().then((states) => {
+			const map: Record<string, State> = {}
+			for (const s of states) map[s.uf] = s
+			setData((prev) => ({ ...prev, statesInfo: map }))
+		})
+	}, [])
 
 	const fetchData = useCallback(async (f: FilterState) => {
 		// Cancel previous request
@@ -50,14 +61,15 @@ export function useFilteredData(filters: FilterState): FilteredData {
 			])
 
 			if (!controller.signal.aborted) {
-				setData({
+				setData((prev) => ({
+					...prev,
 					total: count.total,
 					filtered: count.filtered,
 					stateCompanyCounts: byState,
 					expansionScores: expansion,
 					demandByState: demand,
 					loading: false,
-				})
+				}))
 			}
 		} catch (err) {
 			if (err instanceof DOMException && err.name === 'AbortError') return

@@ -1,3 +1,5 @@
+import type { State } from '@expansio/shared'
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
 async function fetchJson<T>(path: string, signal?: AbortSignal): Promise<T> {
@@ -11,17 +13,7 @@ export function fetchHealth() {
 }
 
 export function fetchStates() {
-	return fetchJson<
-		Array<{
-			uf: string
-			name: string
-			region: string
-			population: number
-			gdpPerCapita: number
-			averageIncome: number
-			potentialScore: number
-		}>
-	>('/states')
+	return fetchJson<State[]>('/states')
 }
 
 export function fetchStatesGeoJSON(signal?: AbortSignal) {

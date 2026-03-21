@@ -1,7 +1,7 @@
 import { useMap } from 'react-leaflet'
 
-const BRAZIL_CENTER: [number, number] = [-15.78, -53.0]
-const DEFAULT_ZOOM = 4
+const BRAZIL_CENTER: [number, number] = [-20, -50.0]
+const DEFAULT_ZOOM = 4.3
 
 export default function MapControls() {
 	const map = useMap()
