@@ -195,16 +195,17 @@ export default function MapView({
 	return (
 		<>
 			<MapContainer
-				center={[-15.78, -53.0]}
-				zoom={4}
+				center={[-20, -50.0]}
+				zoom={4.3}
 				className="leaflet-container"
 				zoomControl={false}
 				scrollWheelZoom={true}
+				zoomSnap={0.1}
 				minZoom={3}
 				maxZoom={18}
 				attributionControl={false}
 				maxBounds={[
-					[8, -80],
+					[8, -75],
 					[-38, -28],
 				]}
 				maxBoundsViscosity={0.8}
@@ -338,6 +339,7 @@ function MapRefCapture({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null
 	}, [map, mapRef])
 	return null
 }
+
 
 // Zoom to selected state from any source (search, map click)
 function MapZoomToState({ selectedUf, geojson, skipZoomRef }: { selectedUf: string | null; geojson: GeoJSON.FeatureCollection | null; skipZoomRef: React.MutableRefObject<boolean> }) {
