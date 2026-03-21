@@ -21,6 +21,7 @@ export default function App() {
 
 	const data = useFilteredData(filters)
 	const [mobileOpen, setMobileOpen] = useState(false)
+	const [cardMinimized, setCardMinimized] = useState(false)
 
 	return (
 		<div className="flex h-screen w-screen flex-col overflow-hidden bg-surface-50 md:flex-row">
@@ -44,14 +45,41 @@ export default function App() {
 					visualization={visualization}
 					markers={markers}
 					selectedUf={selectedUf}
-					onSelectUf={toggleSelectedUf}
+					onSelectUf={(uf) => {
+						toggleSelectedUf(uf)
+						setCardMinimized(false)
+					}}
 					data={data}
 				/>
 
 				{/* Floating state detail — desktop: top-right, mobile: bottom-center */}
 				{selectedUf && (
-					<div className="absolute inset-x-4 bottom-20 z-[1000] animate-fade-in rounded-xl border border-surface-200 bg-white/95 p-4 shadow-lg backdrop-blur-sm md:inset-x-auto md:right-4 md:bottom-auto md:top-16 md:w-[340px] md:p-5">
-						<StateDetail uf={selectedUf} data={data} onClose={() => setSelectedUf(null)} />
+					<div className={`absolute z-[1000] animate-fade-in rounded-xl border border-surface-200 bg-white/95 shadow-lg backdrop-blur-sm ${
+						cardMinimized
+							? 'right-4 top-4 md:right-4 md:top-4'
+							: 'inset-x-4 bottom-20 p-4 md:inset-x-auto md:right-4 md:bottom-auto md:top-4 md:w-[340px] md:p-5'
+					}`}>
+						{cardMinimized ? (
+							<button
+								type="button"
+								onClick={() => setCardMinimized(false)}
+								className="flex items-center gap-3 px-4 py-2.5"
+							>
+								<div>
+									<span className="font-display text-sm font-bold text-primary">
+										{selectedUf}
+									</span>
+									<span className="ml-2 text-xs text-primary/60">
+										{(data.stateCompanyCounts[selectedUf] || 0).toLocaleString('pt-BR')} empresas
+									</span>
+								</div>
+								<svg className="h-4 w-4 text-primary/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} role="img" aria-label="Expandir">
+									<path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+						) : (
+							<StateDetail uf={selectedUf} data={data} onClose={() => setSelectedUf(null)} onMinimize={() => setCardMinimized(true)} />
+						)}
 					</div>
 				)}
 			</main>

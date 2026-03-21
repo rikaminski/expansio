@@ -5,6 +5,7 @@ interface StateDetailProps {
 	uf: string
 	data: FilteredData
 	onClose: () => void
+	onMinimize?: () => void
 }
 
 const STATE_NAMES: Record<string, string> = {
@@ -82,7 +83,7 @@ function ScoreBar({ value, max = 100, color }: { value: number; max?: number; co
 	)
 }
 
-export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
+export default function StateDetail({ uf, data, onClose, onMinimize }: StateDetailProps) {
 	const name = STATE_NAMES[uf] || uf
 	const stateInfo = STATE_DATA[uf]
 	const companyCount = data.stateCompanyCounts[uf] || 0
@@ -97,26 +98,33 @@ export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
-					<h3 className="font-display text-lg font-bold text-primary">{name}</h3>
-					<span className="text-xs text-primary/40">{uf}</span>
+					<h3 className="font-display text-lg font-bold text-primary">
+						{name} <span className="text-sm font-medium text-primary/40">{uf}</span>
+					</h3>
 				</div>
-				<button
-					type="button"
-					onClick={onClose}
-					className="flex h-7 w-7 items-center justify-center rounded-lg text-surface-300 transition-colors hover:bg-surface-50 hover:text-primary"
-				>
-					<svg
-						className="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						strokeWidth={2}
-						role="img"
-						aria-label="Fechar"
+				<div className="flex items-center gap-1">
+					{onMinimize && (
+						<button
+							type="button"
+							onClick={onMinimize}
+							className="flex h-7 w-7 items-center justify-center rounded-lg text-surface-300 transition-colors hover:bg-surface-50 hover:text-primary"
+							title="Minimizar"
+						>
+							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} role="img" aria-label="Minimizar">
+								<path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+							</svg>
+						</button>
+					)}
+					<button
+						type="button"
+						onClick={onClose}
+						className="flex h-7 w-7 items-center justify-center rounded-lg text-surface-300 transition-colors hover:bg-surface-50 hover:text-primary"
 					>
-						<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-					</svg>
-				</button>
+						<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} role="img" aria-label="Fechar">
+							<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
 			</div>
 
 			{/* Key Metrics */}
@@ -126,7 +134,7 @@ export default function StateDetail({ uf, data, onClose }: StateDetailProps) {
 					<p className="font-display text-xl font-bold text-primary">
 						{formatNumber(companyCount)}
 					</p>
-					<p className="text-[10px] text-surface-300">{sharePercent}% do total</p>
+					<p className="text-[10px] font-medium text-primary/60">{sharePercent}% do total</p>
 				</div>
 				<div className="rounded-lg bg-surface-50 p-3">
 					<p className="text-xs text-primary/40">Demanda</p>
